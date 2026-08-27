@@ -88,8 +88,7 @@ Recovery is part of the same run path. A failed selector can retry; an unrespons
 
 
 <p align="center">
-  <a href="https://Appilot.app" target="_blank"><img src="https://github.com/pulseman805ufmv/instagram-android-engagement-automation-bot/blob/main/cdh-gen-b68fdc51c0af4f35.jpg
-" alt="Appilot Banner" width="100%"></a>
+  <a href="https://Appilot.app" target="_blank"><img src="https://github.com/pulseman805ufmv/instagram-android-engagement-automation-bot/blob/main/cdh-gen-b68fdc51c0af4f35.jpg" alt="Appilot Banner" width="100%"></a>
 </p>
 
 
