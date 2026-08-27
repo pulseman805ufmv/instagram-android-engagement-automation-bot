@@ -2,14 +2,17 @@
 
 An Android-based Instagram automation bot that runs directly on real devices using ADB-driven control and UI automation. It removes repetitive manual engagement work by automating common Instagram actions while keeping execution stable through rate limits, cooldowns, and device-level safety controls.
 
+An Android-based worker runs engagement routines directly on real phones instead of treating the app like a browser target. The Instagram Bot Android controls the installed Instagram app through [Android Debug Bridge](https://developer.android.com/tools/adb) and [uiautomator2](https://github.com/openatx/uiautomator2), so likes, story views, profile visits, follows, comments, direct messages, and account switching happen through visible device UI. Scheduled windows, per-action limits, cooldowns, randomized delays, retries, health checks, and failure screenshots keep each device session observable rather than opaque.
+
+The practical fit is social media engagement operations where repetitive tapping and account switching are the bottleneck. The tool accepts an account list, target mode, action settings, and daily limits; connects to a chosen Android device; navigates the app; executes the permitted queue; then writes structured logs, per-account statistics, screenshots on failure, and a daily run summary. I use those outputs to see what actually ran on each phone instead of reconstructing activity manually.
+
 <p align="center">
-  <a href="https://Appilot.app" target="_blank"><img src="https://github.com/Instagram-Automations/Footer-test/blob/main/appilot-baner.png" alt="Appilot Banner" width="100%"></a>
+  <a href="https://Appilot.app" target="_blank"><img src="https://github.com/pulseman805ufmv/instagram-android-engagement-automation-bot/blob/main/cdh-gen-74a421e5250243e3.jpg" alt="Appilot Banner" width="100%"></a>
 </p>
 <p align="center">
   <a href="https://t.me/devpilot1" target="_blank"><img src="https://img.shields.io/badge/Chat%20on-Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram"></a>
   <a href="mailto:support@appilot.app" target="_blank"><img src="https://img.shields.io/badge/Email-support@appilot.app-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail"></a>
   <a href="https://Appilot.app" target="_blank"><img src="https://img.shields.io/badge/Visit-Website-007BFF?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Website"></a>
-  <a href="https://discord.gg/3YrZJZ6hA2" target="_blank"><img src="https://img.shields.io/badge/Join-Appilot_Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Appilot Discord"></a>
 </p>
 
 
@@ -35,25 +38,32 @@ It’s built to run as a reliable device worker with configurable behavior, logg
 
 ## Core Features
 
-| Feature | Description |
-|----------|-------------|
-| Device-Based Execution | Runs on Android devices via ADB with device discovery and session management |
-| Feed Engagement | Like, pause/scroll, and interact with feed posts using configurable rules |
-| Story Engagement | View stories and optionally react based on settings and rate limits |
-| Profile Actions | Visit profiles, follow/unfollow with filters and cooldown windows |
-| Comment Automation | Optional commenting with templated text pools and anti-spam pacing |
-| DM Outreach | Optional DM sending with queueing, deduplication, and safety throttles |
-| Account Switcher | Supports switching between logged-in accounts on the same device |
-| Action Scheduler | Time windows, daily caps, per-action quotas, and randomized delays |
-| Targeting Modes | Engage by hashtags, locations, explore, or seed profiles |
-| Humanization Controls | Variable scroll depth, dwell time, randomized taps, and back navigation patterns |
-| Resilience & Recovery | Auto-retries, app relaunch, soft resets, and stuck-screen detection |
-| Observability | Structured logs, run reports, screenshots on failure, and device health telemetry |
-| Compliance Safeguards | Rate limiting, cooldown intervals, action caps, and configurable “safe mode” |
-| Multi-Device Scaling | Run multiple workers in parallel across connected Android devices |
-| Exportable Reports | Daily summaries, per-account stats, and action-level audit trails |
+| Feature |
+| --- |
+| Device-Based Execution — Runs on Android devices via ADB with device discovery and session management |
+| Feed Engagement — Like, pause/scroll, and interact with feed posts using configurable rules |
+| Story Engagement — View stories and optionally react based on settings and rate limits |
+| Profile Actions — Visit profiles, follow/unfollow with filters and cooldown windows |
+| Comment Automation — Optional commenting with templated text pools and anti-spam pacing |
+| DM Outreach — Optional DM sending with queueing, deduplication, and safety throttles |
+| Account Switcher — Supports switching between logged-in accounts on the same device |
+| Action Scheduler — Time windows, daily caps, per-action quotas, and randomized delays |
+| Targeting Modes — Engage by hashtags, locations, explore, or seed profiles |
+| Humanization Controls — Variable scroll depth, dwell time, randomized taps, and back navigation patterns |
+| Resilience & Recovery — Auto-retries, app relaunch, soft resets, and stuck-screen detection |
+| Observability — Structured logs, run reports, screenshots on failure, and device health telemetry |
+| Compliance Safeguards — Rate limiting, cooldown intervals, action caps, and configurable safe mode |
+| Multi-Device Scaling — Run multiple workers in parallel across connected Android devices |
+| Exportable Reports — Daily summaries, per-account stats, and action-level audit trails |
+| Device discovery and sessions — Manual device selection becomes error-prone once several phones are attached. The worker discovers Android devices through ADB and keeps each run bound to the intended device session. |
+| Feed and story engagement — Repeated feed and story tapping consumes operator time. Configurable routines handle likes, pauses, scrolling, story views, and optional reactions while the pacing layer controls timing. |
+| Profile actions — Manual follow and unfollow work requires constant account context. Profile visits, follows, and unfollows run with filters and cooldown windows. |
+| Comment and DM queues — Free-form sending invites duplicates and bursty behavior. Optional comment templates and DM queues add deduplication, pacing, and safety throttles. |
+| Account switching — Moving between logged-in accounts on one phone creates repetitive navigation. The switcher changes active accounts without requiring a second device. |
+| Scheduling and humanization — Fixed loops are operationally brittle. Time windows, quotas, randomized delays, dwell time, scroll depth, tap variation, and back-navigation patterns vary execution. |
+| Recovery and observability — Real devices sometimes stall or drift into unexpected screens. Retries, relaunches, soft resets, stuck-screen detection, structured logs, screenshots, and health data make problems visible. |
+| Multi-device workers — One-device-at-a-time operation does not fit a device bench. Independent workers can run in parallel across connected Android devices and keep separate audit trails. |
 
----
 
 ## How It Works
 
@@ -178,6 +188,20 @@ Yes. Each connected device can run as an independent worker process with its own
 **How is targeting handled for engagement actions?**  
 Targeting modules support engaging via hashtags, locations, explore browsing, or seed profiles. Each module feeds a task queue that deduplicates targets and applies filters before executing actions.
 
+# FAQs
+
+## Does the bot use the Instagram API?
+
+No. The worker controls the installed Android app through ADB and uiautomator2, so execution happens through device UI rather than an Instagram API integration. That means selectors, screen state, app lifecycle, and device connectivity are operational dependencies.
+
+## Can it run across more than one connected Android device?
+
+Yes. The project supports parallel workers across connected Android devices, with each worker tied to its own device session. Logs, screenshots, health information, and account activity stay associated with the worker that produced them, which makes device-specific failures easier to isolate.
+
+## How are rate limits and cooldowns handled?
+
+Limits are configuration controls applied before actions execute. Allowed time windows, daily caps, per-action quotas, cooldown intervals, randomized delays, and safe-mode settings determine whether the next queued action may proceed. Those controls reduce bursty behavior but do not override platform enforcement or guarantee account status.
+
 ---
 
 ## Performance & Reliability Benchmarks
@@ -191,6 +215,13 @@ Targeting modules support engaging via hashtags, locations, explore browsing, or
 **Resource Efficiency:** Per device worker typically uses 0.3–0.8 CPU core and 400–900MB RAM, with optional screenshot capture increasing disk usage.  
 
 **Error Handling:** Automatic retries with backoff, popup handling, app relaunch, stuck-screen detection, screenshot-on-failure, and structured JSON Logs for debugging and audit trails.
+
+## Observability and Recovery
+
+Structured logs make each action auditable. A useful record carries device context, account context, action type, target context, result, retry state, and failure evidence when something goes wrong. Daily summaries roll that activity up per account, while action-level trails preserve enough detail to investigate a run that behaved unexpectedly. Device health telemetry helps distinguish an automation problem from a disconnected or unhealthy phone.
+
+Failure screenshots are especially useful because UI automation can fail while the Python process is still alive. A screenshot can reveal a modal, login prompt, delayed screen, or navigation state that selectors alone cannot explain. Combined with stuck-screen detection, relaunch, retry, and soft-reset handling, that turns “the worker stopped” into a concrete device state that can be reproduced or handled.
+
 
 <p align="center">
 <a href="https://cal.com/app-pilot-m8i8oo/30min" target="_blank">
