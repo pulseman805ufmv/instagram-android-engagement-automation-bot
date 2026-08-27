@@ -65,6 +65,8 @@ It’s built to run as a reliable device worker with configurable behavior, logg
 | Multi-device workers — One-device-at-a-time operation does not fit a device bench. Independent workers can run in parallel across connected Android devices and keep separate audit trails. |
 
 
+
+
 ## How It Works
 
 | Step | Description |
@@ -75,6 +77,24 @@ It’s built to run as a reliable device worker with configurable behavior, logg
 | **Other Functionalities** | Includes retries, app relaunch on failures, screenshot capture, and queue-based task execution. |
 | **Safety Controls** | Rate limiting, action caps, cooldown windows, randomized timing, and “safe mode” to reduce risky patterns. |
 
+
+# How the Device Worker Runs
+
+Each worker is tied to a real Android device discovered over ADB. A run begins by checking device availability, selecting the requested serial, opening Instagram, and confirming the expected UI state. From there, uiautomator2 selectors handle navigation and element interaction. Optional [OpenCV](https://docs.opencv.org/4.x/) checks can confirm a screen visually when an accessibility selector is not enough, while [Pydantic](https://docs.pydantic.dev/latest/) validation keeps account, quota, targeting, and timing values explicit before execution reaches a phone.
+
+Actions are paced rather than fired as a tight loop. The scheduler applies allowed time windows, daily caps, per-action quotas, cooldown intervals, and variable delays. Feed work can combine likes with pauses and scrolling. Story work can view and optionally react. Profile work can visit, follow, or unfollow according to configured filters. Commenting and DM outreach are optional queues with templates, deduplication, and throttling rather than unrestricted sends.
+
+Recovery is part of the same run path. A failed selector can retry; an unresponsive app can relaunch; a stuck screen can trigger a soft reset; and a failed state can capture a screenshot before the worker exits or moves on. Notifications, delayed loads, unexpected dialogs, and navigation drift are normal device conditions, so the run keeps evidence when the UI stops matching the expected state.
+
+
+<p align="center">
+  <a href="https://Appilot.app" target="_blank"><img src="https://github.com/pulseman805ufmv/instagram-android-engagement-automation-bot/blob/main/cdh-gen-b68fdc51c0af4f35.jpg
+" alt="Appilot Banner" width="100%"></a>
+</p>
+
+
+
+  
 ## Tech Stack
 
 | Component | Description |
